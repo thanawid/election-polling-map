@@ -117,7 +117,7 @@ body{
   background: rgba(2,6,23,.6);
 }
 .item .name{font-weight:800; margin:8px 0 8px; line-height:1.35}
-.item .link{color: var(--accent); font-size:12px; text-decoration:none}
+.item .link{color: #1f2937; font-weight:800; font-size:12px; text-decoration:none}
 .item .link:hover{text-decoration:underline}
 
 .foot{

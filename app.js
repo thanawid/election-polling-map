@@ -43,7 +43,7 @@ function buildPopup(r){
       <div style="color:#6b7280; font-size:12px; margin-bottom:10px">${meta}</div>
       <div style="display:flex; gap:8px; flex-wrap:wrap">
         <a href="${nav}" target="_blank" rel="noopener" style="padding:8px 10px; border-radius:10px; background:#d4af37; color:#2a1200; font-weight:800; text-decoration:none">นำทาง</a>
-        <a href="${open}" target="_blank" rel="noopener" style="padding:8px 10px; border-radius:10px; border:1px solid #3a1460; color:#fff7e6; text-decoration:none">เปิดลิงก์</a>
+        <a href="${open}" target="_blank" rel="noopener" style="padding:8px 10px; border-radius:10px; border:1px solid #3a1460; color:#1f2937; font-weight:800; text-decoration:none">เปิดลิงก์</a>
       </div>
       <div style="margin-top:10px; color:#9ca3af; font-size:11px">
         พิกัด: ${r.lat?.toFixed?.(6)}, ${r.lng?.toFixed?.(6)}
