@@ -1,5 +1,5 @@
 // Simple cache for offline shell (map tiles still need internet)
-const CACHE = "election-pins-v5";
+const CACHE = "election-pins-v6";
 const ASSETS = ["./","./index.html","./style.css","./app.js","./data.json","./manifest.webmanifest"];
 
 self.addEventListener("install", (e) => {

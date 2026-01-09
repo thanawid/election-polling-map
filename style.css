@@ -134,3 +134,35 @@ body{
   .layout{grid-template-columns: 1fr; grid-template-rows: 420px 1fr}
   .panel{border-right:none; border-bottom:1px solid var(--line)}
 }
+
+
+/* === Sidebar text contrast fix === */
+.panel, .panel *{
+  color:#ffffff !important;
+}
+
+.panel .meta,
+.panel .hint,
+.panel .foot{
+  color:#f3e8ff !important;
+}
+
+.panel .badge{
+  color:#ffffff !important;
+  border-color:#d4af37;
+  background:rgba(26,0,48,.85);
+}
+
+.panel .item{
+  background:linear-gradient(180deg, rgba(58,20,96,.95), rgba(26,0,48,.9));
+}
+
+.panel .item .name{
+  color:#ffffff !important;
+  font-weight:800;
+}
+
+.panel .item .link{
+  color:#facc15 !important;
+  font-weight:800;
+}
