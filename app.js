@@ -3,6 +3,14 @@ let map;
 let markersLayer;
 let userMarker = null;
 
+// Purple–Gold custom pin
+const pinIcon = L.icon({
+  iconUrl: './marker.svg',
+  iconSize: [34, 34],
+  iconAnchor: [17, 34],
+  popupAnchor: [0, -30]
+});
+
 const state = {
   all: [],
   filtered: [],
@@ -60,7 +68,7 @@ function renderMarkers(rows){
   markersLayer.clearLayers();
   rows.forEach(r => {
     if (typeof r.lat !== 'number' || typeof r.lng !== 'number') return;
-    const m = L.marker([r.lat, r.lng]).addTo(markersLayer);
+    const m = L.marker([r.lat, r.lng], { icon: pinIcon }).addTo(markersLayer);
     m.bindPopup(buildPopup(r));
     state.byId.set(getId(r), m);
   });
