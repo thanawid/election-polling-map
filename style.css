@@ -1,13 +1,13 @@
 /* Minimal, readable UI */
 :root{
-  --bg:#0b1220;
-  --card:#0f172a;
-  --card2:#111827;
-  --text:#e5e7eb;
-  --muted:#9ca3af;
-  --line:#1f2937;
-  --accent:#22c55e;
-  --accent2:#38bdf8;
+  --bg:#12001f;
+  --card:#1a0030;
+  --card2:#22003d;
+  --text:#fff7e6;
+  --muted:#e9d8ff;
+  --line:#3a1460;
+  --accent:#d4af37;   /* gold */
+  --accent2:#a855f7;  /* purple */
 }
 
 *{box-sizing:border-box}
@@ -26,13 +26,14 @@ body{
   gap:12px;
   padding:14px 16px;
   border-bottom:1px solid var(--line);
-  background: rgba(15,23,42,.7);
+  background: rgba(26,0,48,.72);
   backdrop-filter: blur(10px);
   position:sticky; top:0; z-index:10;
 }
 
 .brand{display:flex; align-items:center; gap:12px}
-.dot{width:12px; height:12px; border-radius:999px; background:var(--accent); box-shadow:0 0 24px rgba(34,197,94,.65)}
+.logo{width:44px; height:44px; border-radius:999px; background:rgba(255,255,255,.06); padding:4px; border:1px solid var(--line)}
+.dot{width:12px; height:12px; border-radius:999px; background:var(--accent); box-shadow:0 0 26px rgba(212,175,55,.55)}
 .title{font-weight:800; letter-spacing:.2px}
 .subtitle{font-size:12px; color:var(--muted); margin-top:2px}
 
@@ -41,12 +42,12 @@ body{
   padding:10px 12px;
   border-radius:12px;
   border:1px solid var(--line);
-  background: linear-gradient(180deg, #111827, #0b1220);
+  background: radial-gradient(1200px 800px at 20% 0%, rgba(212,175,55,.22), transparent 55%), linear-gradient(180deg, #07010d, var(--bg));
   color:var(--text);
   cursor:pointer;
   font-weight:600;
 }
-.btn:hover{border-color:#334155}
+.btn:hover{border-color:rgba(212,175,55,.55)}
 .btn:active{transform: translateY(1px)}
 .btn-ghost{
   background: transparent;
@@ -104,7 +105,7 @@ body{
   background: rgba(2,6,23,.6);
 }
 .item .name{font-weight:800; margin:8px 0 8px; line-height:1.35}
-.item .link{color: var(--accent2); font-size:12px; text-decoration:none}
+.item .link{color: var(--accent); font-size:12px; text-decoration:none}
 .item .link:hover{text-decoration:underline}
 
 .foot{

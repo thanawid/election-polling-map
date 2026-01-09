@@ -1,9 +1,20 @@
 {
-  "name": "พิกัดหน่วยเลือกตั้ง",
-  "short_name": "หน่วยเลือกตั้ง",
+  "name": "พิกัดหน่วยเลือกตั้งเขต 2 นนทบุรี",
+  "short_name": "เขต 2",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#0b1220",
-  "theme_color": "#111827",
-  "icons": []
+  "background_color": "#12001f",
+  "theme_color": "#6A00A8",
+  "icons": [
+    {
+      "src": "logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
 }
