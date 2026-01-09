@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>พิกัดหน่วยเลือกตั้ง</title>
+
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="theme-color" content="#111827">
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="dot" aria-hidden="true"></div>
+      <div>
+        <div class="title">พิกัดหน่วยเลือกตั้ง</div>
+        <div class="subtitle">ค้นหา • ปักหมุด • กดนำทาง (ไม่ต้องเดาเหมือนเดาตัวเลขท้ายงวด)</div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="btnLocate" class="btn">ตำแหน่งของเครื่อง</button>
+      <button id="btnFit" class="btn btn-ghost">ซูมให้เห็นทั้งหมด</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <aside class="panel">
+      <div class="filters">
+        <input id="q" class="input" placeholder="ค้นหา: หน่วย / หมู่ / ชื่อสถานที่..." />
+        <div class="row">
+          <select id="filterMoo" class="select">
+            <option value="">ทุกหมู่</option>
+          </select>
+          <select id="filterDistrict" class="select">
+            <option value="">ทุกเขต</option>
+          </select>
+        </div>
+        <div class="hint">
+          ทิปเล็กๆ: กดรายการ → แผนที่พาไปเอง, กด “นำทาง” → เปิด Google Maps
+        </div>
+      </div>
+
+      <div id="list" class="list" role="list"></div>
+
+      <footer class="foot">
+        <div>ทำงานออฟไลน์ได้ (ยกเว้นแผนที่ต้องมีเน็ต) • ไฟล์ข้อมูล: <code>data.json</code></div>
+      </footer>
+    </aside>
+
+    <section class="mapwrap">
+      <div id="map" class="map" aria-label="แผนที่หน่วยเลือกตั้ง"></div>
+    </section>
+  </main>
+</body>
+</html>
