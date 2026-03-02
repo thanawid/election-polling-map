@@ -1,5 +1,28 @@
 
 
+const unitFilter = document.getElementById("unitFilter");
+
+function populateUnitFilter(data){
+  if(!unitFilter) return;
+  const units = [...new Set(data.map(d=>d["หน่วยเลือกตั้ง"]))].sort((a,b)=>a-b);
+  unitFilter.innerHTML = '<option value="all">ทุกหน่วยเลือกตั้ง</option>';
+  units.forEach(u=>{
+    const opt = document.createElement("option");
+    opt.value = u;
+    opt.textContent = "หน่วยที่ " + u;
+    unitFilter.appendChild(opt);
+  });
+}
+
+function applyUnitFilter(data){
+  if(!unitFilter || unitFilter.value==="all") return data;
+  return data.filter(d=>String(d["หน่วยเลือกตั้ง"])===unitFilter.value);
+}
+
+unitFilter?.addEventListener("change",()=>loadData());
+
+
+
 const filterMode = document.getElementById("filterMode");
 
 function applyFilter(data){
