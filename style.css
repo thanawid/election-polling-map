@@ -166,3 +166,15 @@ body{
   color:#facc15 !important;
   font-weight:800;
 }
+
+
+/* === District color accents (เขต 1/2/3) === */
+.item{ border-left:4px solid transparent; }
+.item.district-1{ border-left-color:#a855f7; } /* ม่วง */
+.item.district-2{ border-left-color:#d4af37; } /* ทอง */
+.item.district-3{ border-left-color:#3b82f6; } /* น้ำเงิน */
+
+/* ทำให้ป้าย 'เขต' เด่นตามสีเขต */
+.item.district-1 .meta .badge:first-child{ background:rgba(168,85,247,.22); border-color:rgba(168,85,247,.6); }
+.item.district-2 .meta .badge:first-child{ background:rgba(212,175,55,.22); border-color:rgba(212,175,55,.6); }
+.item.district-3 .meta .badge:first-child{ background:rgba(59,130,246,.22); border-color:rgba(59,130,246,.6); }

@@ -3,13 +3,18 @@ let map;
 let markersLayer;
 let userMarker = null;
 
-// Purple–Gold custom pin
-const pinIcon = L.icon({
-  iconUrl: './marker.svg',
-  iconSize: [34, 34],
-  iconAnchor: [17, 34],
-  popupAnchor: [0, -30]
-});
+// District-colored pins (ตามเขตเลือกตั้ง)
+const pinIcons = {
+  1: L.icon({ iconUrl: './marker_d1_purple.svg', iconSize: [34,34], iconAnchor: [17,34], popupAnchor: [0,-30]}),
+  2: L.icon({ iconUrl: './marker_d2_gold.svg',   iconSize: [34,34], iconAnchor: [17,34], popupAnchor: [0,-30]}),
+  3: L.icon({ iconUrl: './marker_d3_blue.svg',   iconSize: [34,34], iconAnchor: [17,34], popupAnchor: [0,-30]}),
+  0: L.icon({ iconUrl: './marker.svg',           iconSize: [34,34], iconAnchor: [17,34], popupAnchor: [0,-30]})
+};
+
+function iconFor(r){
+  const d = Number(r.เขตเลือกตั้ง || 0);
+  return pinIcons[d] || pinIcons[0];
+}
 
 const state = {
   all: [],
@@ -68,7 +73,7 @@ function renderMarkers(rows){
   markersLayer.clearLayers();
   rows.forEach(r => {
     if (typeof r.lat !== 'number' || typeof r.lng !== 'number') return;
-    const m = L.marker([r.lat, r.lng], { icon: pinIcon }).addTo(markersLayer);
+    const m = L.marker([r.lat, r.lng], { icon: iconFor(r) }).addTo(markersLayer);
     m.bindPopup(buildPopup(r));
     state.byId.set(getId(r), m);
   });
@@ -85,7 +90,7 @@ function renderList(rows){
   rows.forEach(r => {
     const id = getId(r);
     const div = document.createElement('div');
-    div.className = 'item';
+    div.className = `item district-${r.เขตเลือกตั้ง || 0}`;
     div.setAttribute('role','listitem');
     div.dataset.id = id;
 
