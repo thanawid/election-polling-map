@@ -1,3 +1,25 @@
+
+
+const filterMode = document.getElementById("filterMode");
+
+function applyFilter(data){
+  if(!filterMode) return data;
+
+  if(filterMode.value==="zone"){
+    return data.sort((a,b)=> (a["เขตเลือกตั้ง"]||0)-(b["เขตเลือกตั้ง"]||0));
+  }
+
+  if(filterMode.value==="moo"){
+    return data.sort((a,b)=> (a["หมู่ที่"]||0)-(b["หมู่ที่"]||0));
+  }
+
+  return data.sort((a,b)=> (a["หน่วยเลือกตั้ง"]||0)-(b["หน่วยเลือกตั้ง"]||0));
+}
+
+filterMode?.addEventListener("change",()=>{
+  loadData();
+});
+
 /* Election Pins App (Leaflet + local data.json) */
 let map;
 let markersLayer;
