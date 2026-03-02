@@ -1,5 +1,5 @@
 // Simple cache for offline shell (map tiles still need internet)
-const CACHE = "election-pins-v12";
+const CACHE = "election-pins-2026-03-02";
 const ASSETS = ["./","./index.html","./style.css","./app.js","./data.json","./manifest.webmanifest"];
 
 self.addEventListener("install", (e) => {
@@ -18,7 +18,7 @@ self.addEventListener("activate", (e) => {
 self.addEventListener("fetch", (e) => {
   const url = new URL(e.request.url);
 
-  // Always try network first for data.json so updates propagate immediately
+  // Network-first for data.json so updates propagate immediately
   if (url.origin === location.origin && url.pathname.endsWith("/data.json")) {
     e.respondWith(
       fetch(e.request, { cache: "no-store" })
@@ -32,7 +32,7 @@ self.addEventListener("fetch", (e) => {
     return;
   }
 
-  // Default: cache-first for app shell
+  // Cache-first for app shell
   if (url.origin === location.origin) {
     e.respondWith(caches.match(e.request).then((r) => r || fetch(e.request)));
   }
