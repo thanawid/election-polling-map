@@ -1,16 +1,100 @@
+const GOLD = "#d4af37";
+const ZONE_COLORS = {
+  1: "#7b2cbf",   // purple
+  2: "#9d4edd",   // violet
+  3: "#2a9d8f",   // teal
+  4: "#e63946",   // red
+  5: "#f4a261",   // orange
+  6: "#1d3557"    // navy
+};
+
+const pinIconCache = new Map();
+
+function getPinIcon(zone){
+  const z = Number(zone) || 0;
+  const key = String(z);
+  if(pinIconCache.has(key)) return pinIconCache.get(key);
+
+  const color = ZONE_COLORS[z] || "#7b2cbf";
+  const label = z ? String(z) : "";
+  const svg = `
+  <svg xmlns="http://www.w3.org/2000/svg" width="34" height="42" viewBox="0 0 64 80">
+    <defs>
+      <filter id="ds" x="-40%" y="-40%" width="180%" height="180%">
+        <feDropShadow dx="0" dy="3" stdDeviation="2" flood-color="rgba(0,0,0,0.35)"/>
+      </filter>
+    </defs>
+    <g filter="url(#ds)">
+      <path d="M32 2C20 2 10 12 10 24c0 20 22 54 22 54s22-34 22-54C54 12 44 2 32 2z"
+        fill="${color}" stroke="${GOLD}" stroke-width="4" />
+      <circle cx="32" cy="24" r="12" fill="white" stroke="${GOLD}" stroke-width="3"/>
+      <text x="32" y="29" text-anchor="middle" font-family="system-ui,Segoe UI,Arial" font-size="14" font-weight="700" fill="${color}">${label}</text>
+    </g>
+  </svg>`;
+
+  const icon = L.divIcon({
+    className: "pin-icon",
+    html: svg,
+    iconSize: [34, 42],
+    iconAnchor: [17, 42],
+    popupAnchor: [0, -36]
+  });
+
+  pinIconCache.set(key, icon);
+  return icon;
+}
+
+
+
+const unitFilter = document.getElementById("unitFilter");
+
+function populateUnitFilter(data){
+  if(!unitFilter) return;
+  const units = [...new Set(data.map(d=>d["หน่วยเลือกตั้ง"]))].sort((a,b)=>a-b);
+  unitFilter.innerHTML = '<option value="all">ทุกหน่วยเลือกตั้ง</option>';
+  units.forEach(u=>{
+    const opt = document.createElement("option");
+    opt.value = u;
+    opt.textContent = "หน่วยที่ " + u;
+    unitFilter.appendChild(opt);
+  });
+}
+
+function applyUnitFilter(data){
+  if(!unitFilter || unitFilter.value==="all") return data;
+  return data.filter(d=>String(d["หน่วยเลือกตั้ง"])===unitFilter.value);
+}
+
+unitFilter?.addEventListener("change",()=>loadData());
+
+
+
+const filterMode = document.getElementById("filterMode");
+
+function applyFilter(data){
+  if(!filterMode) return data;
+
+  if(filterMode.value==="zone"){
+    return data.sort((a,b)=> (a["เขตเลือกตั้ง"]||0)-(b["เขตเลือกตั้ง"]||0));
+  }
+
+  if(filterMode.value==="moo"){
+    return data.sort((a,b)=> (a["หมู่ที่"]||0)-(b["หมู่ที่"]||0));
+  }
+
+  return data.sort((a,b)=> (a["หน่วยเลือกตั้ง"]||0)-(b["หน่วยเลือกตั้ง"]||0));
+}
+
+filterMode?.addEventListener("change",()=>{
+  loadData();
+});
+
 /* Election Pins App (Leaflet + local data.json) */
 let map;
 let markersLayer;
 let userMarker = null;
 
 // Purple–Gold custom pin
-const pinIcon = L.icon({
-  iconUrl: './marker.svg',
-  iconSize: [34, 34],
-  iconAnchor: [17, 34],
-  popupAnchor: [0, -30]
-});
-
 const state = {
   all: [],
   filtered: [],
@@ -68,7 +152,7 @@ function renderMarkers(rows){
   markersLayer.clearLayers();
   rows.forEach(r => {
     if (typeof r.lat !== 'number' || typeof r.lng !== 'number') return;
-    const m = L.marker([r.lat, r.lng], { icon: pinIcon }).addTo(markersLayer);
+    const m = L.marker([r.lat, r.lng], { icon: getPinIcon(r.เขตเลือกตั้ง) }).addTo(markersLayer);
     m.bindPopup(buildPopup(r));
     state.byId.set(getId(r), m);
   });
