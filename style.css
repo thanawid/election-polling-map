@@ -340,3 +340,20 @@ body{
     font-size:12px !important;
   }
 }
+
+
+/* === v21 Smart Search === */
+.search-feedback{
+  display:none;
+  margin-top:8px;
+  padding:8px 10px;
+  border-radius:10px;
+  background:rgba(255,255,255,.055);
+  border:1px solid rgba(255,255,255,.10);
+  color:#f8fafc !important;
+  font-size:12px;
+  line-height:1.4;
+}
+.search-feedback small{
+  color:#cbd5e1 !important;
+}

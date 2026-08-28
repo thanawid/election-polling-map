@@ -165,8 +165,118 @@ function setupFilters(){
   el('btnLocate').addEventListener('click', locateUser);
 }
 
+function normalizeSearchText(value){
+  return String(value ?? '')
+    .toLowerCase()
+    .replace(/[–—-]/g, ' ')
+    .replace(/[.,()\/\\]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function compactSearchText(value){
+  return normalizeSearchText(value).replace(/\s+/g,'');
+}
+
+function extractNumber(query, labels){
+  const q = normalizeSearchText(query);
+  for (const label of labels){
+    const re = new RegExp(label + '\\s*(?:ที่\\s*)?(\\d+)', 'i');
+    const m = q.match(re);
+    if (m) return Number(m[1]);
+  }
+  return null;
+}
+
+function smartMatches(r, rawQuery){
+  const q = normalizeSearchText(rawQuery);
+  const qc = compactSearchText(rawQuery);
+  if (!q) return true;
+
+  const district = Number(r.เขตเลือกตั้ง ?? 0);
+  const unit = Number(r.หน่วยเลือกตั้ง ?? 0);
+  const moo = Number(r.หมู่ที่ ?? 0);
+
+  // เข้าใจคำที่ผู้ใช้มักพิมพ์จริง
+  const qDistrict = extractNumber(q, ['เขตเลือกตั้ง', 'เขต']);
+  const qUnit = extractNumber(q, ['หน่วยเลือกตั้ง', 'หน่วย']);
+  const qMoo = extractNumber(q, ['หมู่ที่', 'หมู่', 'ม']);
+
+  if (qDistrict !== null && district !== qDistrict) return false;
+  if (qUnit !== null && unit !== qUnit) return false;
+  if (qMoo !== null && moo !== qMoo) return false;
+
+  // ถ้าพิมพ์เป็นตัวเลขล้วน เช่น "5" ให้หาได้ทั้งหน่วย/หมู่/เขต
+  if (/^\d+$/.test(q)){
+    const n = Number(q);
+    return district === n || unit === n || moo === n;
+  }
+
+  // สร้างคลังคำค้นทั้งแบบเว้นวรรคและไม่เว้นวรรค
+  const searchable = [
+    r.ชื่อสถานที่เลือกตั้ง ?? '',
+    `เขต ${district}`, `เขต${district}`, `เขตเลือกตั้ง ${district}`,
+    `หน่วย ${unit}`, `หน่วย${unit}`, `หน่วยที่ ${unit}`, `หน่วยเลือกตั้ง ${unit}`,
+    `หมู่ ${moo}`, `หมู่${moo}`, `หมู่ที่ ${moo}`, `ม ${moo}`, `ม.${moo}`,
+  ];
+
+  const hay = normalizeSearchText(searchable.join(' '));
+  const hayCompact = compactSearchText(searchable.join(' '));
+
+  // ตัดคำบอกประเภทออก เพื่อเหลือ keyword สถานที่
+  let keyword = q
+    .replace(/เขตเลือกตั้ง\s*(?:ที่\s*)?\d+/g,' ')
+    .replace(/เขต\s*(?:ที่\s*)?\d+/g,' ')
+    .replace(/หน่วยเลือกตั้ง\s*(?:ที่\s*)?\d+/g,' ')
+    .replace(/หน่วย\s*(?:ที่\s*)?\d+/g,' ')
+    .replace(/หมู่ที่\s*\d+/g,' ')
+    .replace(/หมู่\s*(?:ที่\s*)?\d+/g,' ')
+    .replace(/ม\.?\s*\d+/g,' ')
+    .replace(/\s+/g,' ')
+    .trim();
+
+  // ถ้ามีเงื่อนไขเขต/หน่วย/หมู่แล้ว และไม่มี keyword อื่น ถือว่าตรง
+  if (!keyword && (qDistrict !== null || qUnit !== null || qMoo !== null)) return true;
+
+  // รองรับการพิมพ์ติดกัน เช่น เขต1, หน่วย5, หมู่3
+  if (hay.includes(q) || hayCompact.includes(qc)) return true;
+
+  // ค้นคำสถานที่หลายคำแบบ AND เช่น "เพอร์เฟค ราชพฤกษ์"
+  if (keyword){
+    const words = keyword.split(' ').filter(Boolean);
+    return words.every(w => hay.includes(w) || hayCompact.includes(w.replace(/\s+/g,'')));
+  }
+
+  return false;
+}
+
+function updateSearchFeedback(rows, query){
+  let box = document.getElementById('searchFeedback');
+  if (!box){
+    box = document.createElement('div');
+    box.id = 'searchFeedback';
+    box.className = 'search-feedback';
+    const filters = document.querySelector('.filters');
+    if (filters) filters.appendChild(box);
+  }
+
+  const q = (query || '').trim();
+  if (!q){
+    box.textContent = '';
+    box.style.display = 'none';
+    return;
+  }
+
+  box.style.display = 'block';
+  if (rows.length){
+    box.textContent = `พบ ${rows.length} หน่วย จากคำค้น “${q}”`;
+  }else{
+    box.innerHTML = `ไม่พบข้อมูลจาก “${q}”<br><small>ลองพิมพ์ เช่น เขต 1, หน่วย 5, หมู่ 3, วัดบางรักน้อย หรือ เพอร์เฟค</small>`;
+  }
+}
+
 function applyFilters(){
-  const q = (el('q').value || '').trim().toLowerCase();
+  const q = (el('q').value || '').trim();
   const moo = el('filterMoo').value;
   const dist = el('filterDistrict').value;
 
@@ -175,16 +285,17 @@ function applyFilters(){
   if (moo) rows = rows.filter(r => String(r.หมู่ที่ ?? '') === moo);
   if (dist) rows = rows.filter(r => String(r.เขตเลือกตั้ง ?? '') === dist);
 
-  if (q){
-    rows = rows.filter(r => {
-      const hay = `${r.ชื่อสถานที่เลือกตั้ง ?? ''} ${r.หน่วยเลือกตั้ง ?? ''} ${r.หมู่ที่ ?? ''} ${r.เขตเลือกตั้ง ?? ''}`.toLowerCase();
-      return hay.includes(q);
-    });
-  }
+  if (q) rows = rows.filter(r => smartMatches(r, q));
 
   state.filtered = rows;
   renderMarkers(rows);
   renderList(rows);
+  updateSearchFeedback(rows, q);
+
+  // ถ้าพบรายการเดียว ให้ซูมไปยังหน่วยนั้นอัตโนมัติแบบนุ่มนวล
+  if (q && rows.length === 1 && typeof rows[0].lat === 'number' && typeof rows[0].lng === 'number'){
+    map.setView([rows[0].lat, rows[0].lng], Math.max(map.getZoom(), 16), {animate:true});
+  }
 }
 
 function fitAll(){
