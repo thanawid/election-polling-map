@@ -104,7 +104,8 @@ function renderList(rows){
         <span class="badge">${r.หมู่ที่ != null ? 'หมู่ '+r.หมู่ที่ : 'หมู่ -'}</span>
       </div>
       <div class="name">${r.ชื่อสถานที่เลือกตั้ง || '-'}</div>
-      <a class="link" href="${link}" target="_blank" rel="noopener">เปิดลิงก์สถานที่</a>
+      <a class="route" href="${googleDirLink(r.lat, r.lng)}" target="_blank" rel="noopener">📍 นำทางไปหน่วยเลือกตั้ง</a>
+      <a class="link-secondary" href="${link}" target="_blank" rel="noopener">เปิดจุดสถานที่ใน Google Maps</a>
     `;
 
     div.addEventListener('click', (e) => {
@@ -135,6 +136,28 @@ function uniqueSorted(arr){
   return Array.from(new Set(arr)).sort((a,b)=> (a??0) - (b??0));
 }
 
+function setupDistrictQuickFilters(){
+  const wrap = el('districtQuickFilters');
+  if (!wrap) return;
+  wrap.querySelectorAll('.district-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      el('filterDistrict').value = btn.dataset.district || '';
+      wrap.querySelectorAll('.district-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      applyFilters();
+    });
+  });
+}
+
+function syncDistrictQuickFilters(){
+  const wrap = el('districtQuickFilters');
+  if (!wrap) return;
+  const value = el('filterDistrict').value || '';
+  wrap.querySelectorAll('.district-btn').forEach(btn => {
+    btn.classList.toggle('active', (btn.dataset.district || '') === value);
+  });
+}
+
 function setupFilters(){
   const mooSel = el('filterMoo');
   const distSel = el('filterDistrict');
@@ -158,11 +181,12 @@ function setupFilters(){
 
   ['q','filterMoo','filterDistrict'].forEach(id => {
     el(id).addEventListener('input', applyFilters);
-    el(id).addEventListener('change', applyFilters);
+    el(id).addEventListener('change', () => { applyFilters(); if (id==='filterDistrict') syncDistrictQuickFilters(); });
   });
 
   el('btnFit').addEventListener('click', fitAll);
   el('btnLocate').addEventListener('click', locateUser);
+  setupDistrictQuickFilters();
 }
 
 function applyFilters(){
@@ -176,9 +200,21 @@ function applyFilters(){
   if (dist) rows = rows.filter(r => String(r.เขตเลือกตั้ง ?? '') === dist);
 
   if (q){
+    const qn = q.replace(/\s+/g,' ').trim();
     rows = rows.filter(r => {
-      const hay = `${r.ชื่อสถานที่เลือกตั้ง ?? ''} ${r.หน่วยเลือกตั้ง ?? ''} ${r.หมู่ที่ ?? ''} ${r.เขตเลือกตั้ง ?? ''}`.toLowerCase();
-      return hay.includes(q);
+      const hay = [
+        r.ชื่อสถานที่เลือกตั้ง ?? '',
+        r.หน่วยเลือกตั้ง ?? '',
+        r.หมู่ที่ ?? '',
+        r.เขตเลือกตั้ง ?? '',
+        `หน่วย ${r.หน่วยเลือกตั้ง ?? ''}`,
+        `หน่วยที่ ${r.หน่วยเลือกตั้ง ?? ''}`,
+        `หมู่ ${r.หมู่ที่ ?? ''}`,
+        `หมู่ที่ ${r.หมู่ที่ ?? ''}`,
+        `เขต ${r.เขตเลือกตั้ง ?? ''}`,
+        `เขตเลือกตั้ง ${r.เขตเลือกตั้ง ?? ''}`
+      ].join(' ').toLowerCase();
+      return hay.includes(qn);
     });
   }
 
