@@ -357,3 +357,12 @@ body{
 .search-feedback small{
   color:#cbd5e1 !important;
 }
+
+
+/* === v22: no district text, continuous unit numbers === */
+.row-single{
+  grid-template-columns:1fr !important;
+}
+.item{
+  border-left:4px solid rgba(212,175,55,.35) !important;
+}

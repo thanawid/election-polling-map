@@ -26,8 +26,7 @@ function el(id){ return document.getElementById(id); }
 
 function formatMeta(r){
   const parts = [];
-  if (r.เขตเลือกตั้ง != null) parts.push(`เขต ${r.เขตเลือกตั้ง}`);
-  if (r.หน่วยเลือกตั้ง != null) parts.push(`หน่วย ${r.หน่วยเลือกตั้ง}`);
+  if (r.หน่วยเลือกตั้ง != null) parts.push(`หน่วยเลือกตั้งที่ ${r.หน่วยเลือกตั้ง}`);
   if (r.หมู่ที่ != null) parts.push(`หมู่ ${r.หมู่ที่}`);
   return parts.length ? parts.join(" • ") : "—";
 }
@@ -90,7 +89,7 @@ function renderList(rows){
   rows.forEach(r => {
     const id = getId(r);
     const div = document.createElement('div');
-    div.className = `item district-${r.เขตเลือกตั้ง || 0}`;
+    div.className = 'item';
     div.setAttribute('role','listitem');
     div.dataset.id = id;
 
@@ -99,8 +98,7 @@ function renderList(rows){
 
     div.innerHTML = `
       <div class="meta">
-        <span class="badge">${r.เขตเลือกตั้ง != null ? 'เขต '+r.เขตเลือกตั้ง : 'เขต -'}</span>
-        <span class="badge">${r.หน่วยเลือกตั้ง != null ? 'หน่วย '+r.หน่วยเลือกตั้ง : 'หน่วย -'}</span>
+        <span class="badge">${r.หน่วยเลือกตั้ง != null ? 'หน่วยเลือกตั้งที่ '+r.หน่วยเลือกตั้ง : 'หน่วย -'}</span>
         <span class="badge">${r.หมู่ที่ != null ? 'หมู่ '+r.หมู่ที่ : 'หมู่ -'}</span>
       </div>
       <div class="name">${r.ชื่อสถานที่เลือกตั้ง || '-'}</div>
@@ -137,10 +135,7 @@ function uniqueSorted(arr){
 
 function setupFilters(){
   const mooSel = el('filterMoo');
-  const distSel = el('filterDistrict');
-
   const moos = uniqueSorted(state.all.map(r => r.หมู่ที่).filter(v => v!=null));
-  const dists = uniqueSorted(state.all.map(r => r.เขตเลือกตั้ง).filter(v => v!=null));
 
   moos.forEach(v => {
     const o=document.createElement('option');
@@ -149,14 +144,7 @@ function setupFilters(){
     mooSel.appendChild(o);
   });
 
-  dists.forEach(v => {
-    const o=document.createElement('option');
-    o.value=String(v);
-    o.textContent=`เขต ${v}`;
-    distSel.appendChild(o);
-  });
-
-  ['q','filterMoo','filterDistrict'].forEach(id => {
+  ['q','filterMoo'].forEach(id => {
     el(id).addEventListener('input', applyFilters);
     el(id).addEventListener('change', applyFilters);
   });
@@ -209,14 +197,13 @@ function smartMatches(r, rawQuery){
   // ถ้าพิมพ์เป็นตัวเลขล้วน เช่น "5" ให้หาได้ทั้งหน่วย/หมู่/เขต
   if (/^\d+$/.test(q)){
     const n = Number(q);
-    return district === n || unit === n || moo === n;
+    return unit === n || moo === n;
   }
 
   // สร้างคลังคำค้นทั้งแบบเว้นวรรคและไม่เว้นวรรค
   const searchable = [
     r.ชื่อสถานที่เลือกตั้ง ?? '',
-    `เขต ${district}`, `เขต${district}`, `เขตเลือกตั้ง ${district}`,
-    `หน่วย ${unit}`, `หน่วย${unit}`, `หน่วยที่ ${unit}`, `หน่วยเลือกตั้ง ${unit}`,
+    `หน่วย ${unit}`, `หน่วย${unit}`, `หน่วยที่ ${unit}`, `หน่วยเลือกตั้ง ${unit}`, `หน่วยเลือกตั้งที่ ${unit}`,
     `หมู่ ${moo}`, `หมู่${moo}`, `หมู่ที่ ${moo}`, `ม ${moo}`, `ม.${moo}`,
   ];
 
@@ -278,12 +265,10 @@ function updateSearchFeedback(rows, query){
 function applyFilters(){
   const q = (el('q').value || '').trim();
   const moo = el('filterMoo').value;
-  const dist = el('filterDistrict').value;
 
   let rows = state.all.slice();
 
   if (moo) rows = rows.filter(r => String(r.หมู่ที่ ?? '') === moo);
-  if (dist) rows = rows.filter(r => String(r.เขตเลือกตั้ง ?? '') === dist);
 
   if (q) rows = rows.filter(r => smartMatches(r, q));
 
