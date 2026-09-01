@@ -3,17 +3,16 @@ let map;
 let markersLayer;
 let userMarker = null;
 
-// District-colored pins (ตามเขตเลือกตั้ง)
-const pinIcons = {
-  1: L.icon({ iconUrl: './marker_d1_purple.svg', iconSize: [34,34], iconAnchor: [17,34], popupAnchor: [0,-30]}),
-  2: L.icon({ iconUrl: './marker_d2_gold.svg',   iconSize: [34,34], iconAnchor: [17,34], popupAnchor: [0,-30]}),
-  3: L.icon({ iconUrl: './marker_d3_blue.svg',   iconSize: [34,34], iconAnchor: [17,34], popupAnchor: [0,-30]}),
-  0: L.icon({ iconUrl: './marker.svg',           iconSize: [34,34], iconAnchor: [17,34], popupAnchor: [0,-30]})
-};
+// หมุดเดียวสำหรับทุกหน่วยเลือกตั้ง
+const pinIcon = L.icon({
+  iconUrl: './marker.svg',
+  iconSize: [34,34],
+  iconAnchor: [17,34],
+  popupAnchor: [0,-30]
+});
 
 function iconFor(r){
-  const d = Number(r.เขตเลือกตั้ง || 0);
-  return pinIcons[d] || pinIcons[0];
+  return pinIcon;
 }
 
 const state = {
@@ -80,7 +79,7 @@ function renderMarkers(rows){
 
 function getId(r){
   // stable-ish id
-  return `${r.เขตเลือกตั้ง ?? 'x'}-${r.หน่วยเลือกตั้ง ?? 'x'}-${r.หมู่ที่ ?? 'x'}-${(r.ลิงก์||'').slice(-6)}`;
+  return `${r.หน่วยเลือกตั้ง ?? 'x'}-${r.หมู่ที่ ?? 'x'}-${(r.ลิงก์||'').slice(-6)}`;
 }
 
 function renderList(rows){
@@ -203,6 +202,7 @@ function smartMatches(r, rawQuery){
   // สร้างคลังคำค้นทั้งแบบเว้นวรรคและไม่เว้นวรรค
   const searchable = [
     r.ชื่อสถานที่เลือกตั้ง ?? '',
+        r.บ้านเลขที่ ?? '',
     `หน่วย ${unit}`, `หน่วย${unit}`, `หน่วยที่ ${unit}`, `หน่วยเลือกตั้ง ${unit}`, `หน่วยเลือกตั้งที่ ${unit}`,
     `หมู่ ${moo}`, `หมู่${moo}`, `หมู่ที่ ${moo}`, `ม ${moo}`, `ม.${moo}`,
   ];
